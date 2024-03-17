@@ -1,7 +1,7 @@
 --임뷰먼트 오브 블랙
 local s,id=GetID()
 function s.initial_effect(c)
-	c:EnablereviveLimit()
+	c:EnableReviveLimit()
 	--레벨 7 몬스터 1장
 	Link.AddProcedure(c,s.matfilter,1,1)
 	--패에 넣는다
