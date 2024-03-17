@@ -4,15 +4,13 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--레벨 7 몬스터 1장
 	Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsLevel,7),1,1)
-	--마법 / 함정은 상대 효과를 받지 않는다
+	--마법 / 함정에 체인할 수 없다
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_CHAINING)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(function() return Duel.HasFlagEffect(0,id) end)
-	e1:SetTargetRange(LOCATION_ONFIELD,0)
-	e1:SetTarget(function(e,c) return c:IsFaceup() and c:IsSpellTrap() end)
-	e1:SetValue(aux.indoval)
+	e1:SetOperation(s.chop)
 	c:RegisterEffect(e1)
 	--패에 넣는다
 	local e2=Effect.CreateEffect(c)
@@ -30,16 +28,24 @@ function s.initial_effect(c)
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		ge1:SetCode(EVENT_REMOVE)
-		ge1:SetCondition(s.imcon)
+		ge1:SetCondition(s.chcon)
 		ge1:SetOperation(function() Duel.RegisterFlagEffect(0,id,RESET_PHASE|PHASE_END,0,1) end)
 		Duel.RegisterEffect(ge1,0)
 	end)
 end
-function s.imfilter(c)
+function s.chfilter(c)
 	return c:IsFaceup() and c:IsMonster()
 end
-function s.imcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.imfilter,1,nil)
+function s.chcon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(s.chfilter,1,nil)
+end
+function s.chop(e,tp,eg,ep,ev,re,r,rp)
+	if re:IsSpellTrapEffect() and re:GetOwnerPlayer()==tp then
+		Duel.SetChainLimit(s.chlm)
+	end
+end
+function s.chlm(e,ep,tp)
+	return ep==tp
 end
 function s.thfilter(c)
 	return c:IsFaceup() and c:IsMonster() and c:IsLevel(7) and c:IsAbleToHand()
