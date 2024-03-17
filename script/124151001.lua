@@ -3,7 +3,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--레벨 7 몬스터 1장
-	Link.AddProcedure(c,s.matfilter,1,1)
+	Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsLevel,7),1,1)
 	--패에 넣는다
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
@@ -15,9 +15,6 @@ function s.initial_effect(c)
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
-end
-function s.matfilter(c,sc,st,tp)
-	return c:IsLevel(7)
 end
 function s.thfilter(c)
 	return c:IsFaceup() and c:IsLevel(7)
